@@ -33,7 +33,7 @@ void loop() {
   soilMoistureLevel = 10;
 
   char json[256]; // Get the json string for ThingSpeak
-  snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoistureLevel\":%.2f}", lightIntensityFrequency, soilMoistureLevel);
+  snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoisture\":%.2f}", lightIntensityFrequency, soilMoistureLevel);
   Particle.publish("sendPlantStats", json); // Send the data to the webhook
 
   delay(1000);
