@@ -1,6 +1,6 @@
 /* 
- * Project myProject
- * Author: Your Name
+ * Project: Plant Caretaker
+ * Authors: Pachia Lee and Jake Robbins
  * Date: 
  * For comprehensive documentation and examples, please visit:
  * https://docs.particle.io/firmware/best-practices/firmware-template/
@@ -34,7 +34,7 @@ void loop() {
 
   char json[256]; // Get the json string for ThingSpeak
   snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoistureLevel\":%.2f}", lightIntensityFrequency, soilMoistureLevel);
-  Particle.publish("sendPlantStats", json);
+  Particle.publish("sendPlantStats", json); // Send the data to the webhook
 
   delay(1000);
 }
