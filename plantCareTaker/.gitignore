@@ -3,6 +3,7 @@
 *.pem
 
 # Ignore build results and bundles
+nul
 *.bin
 *.zip
 [Dd]ebug/
