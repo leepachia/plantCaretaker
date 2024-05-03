@@ -29,6 +29,17 @@ double lightIntensityFrequency;
 // setup() runs once, when the device is first turned on
 void setup() {
   // Put initialization like pinMode and begin functions here
+
+  //This is how we would trigger something remotely.
+  //I'd kinda forgotten about Particle.function()
+  //I'm not sure how many cloud functions we'll need,
+  //but it supports up to twelve
+  Particle.function("waterPlant", waterPlant);
+}
+
+int waterPlant (String argument) {
+  //turn the pin on, then off or something
+  //like that.
 }
 
 // loop() runs over and over again, as quickly as it can execute.
