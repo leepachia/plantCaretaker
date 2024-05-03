@@ -8,6 +8,10 @@
 
 // Include Particle Device OS APIs
 #include "Particle.h"
+#define TOKEN "BBUS-2mjQJfs1kFlFgeWbcJXfKzGjY1wSEY"
+#include "Ubidots.h"
+
+Ubidots ubidots(TOKEN, UBI_HTTP); 
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -35,6 +39,11 @@ void loop() {
   char json[256]; // Get the json string for ThingSpeak
   snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoisture\":%.2f}", lightIntensityFrequency, soilMoistureLevel);
   Particle.publish("sendPlantStats", json); // Send the data to the webhook
+
+  // Send info to ubidots
+  ubidots.add("LightIntensity", lightIntensityFrequency);
+  ubidots.add("SoilMoisture", soilMoistureLevel);
+  ubidots.send();
 
   delay(1000);
 }

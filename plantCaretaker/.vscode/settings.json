@@ -6,5 +6,6 @@
     },
     "particle.firmwareVersion": "5.8.0",
     "particle.targetPlatform": "p2",
-    "particle.targetDevice": "pachia"
+    "particle.targetDevice": "pachia",
+    "C_Cpp.errorSquiggles": "disabled"
 }
