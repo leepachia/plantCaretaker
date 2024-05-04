@@ -13,7 +13,7 @@
 
 const int SOIL_SENSOR = A1;
 const int LIGHT_SENSOR = A5;
-const int MOTOR = D2;
+const int MOTOR = D0;
 
 Ubidots ubidots(TOKEN, UBI_HTTP); 
 
@@ -41,6 +41,7 @@ void setup() {
   // Put initialization like pinMode and begin functions here
   pinMode(SOIL_SENSOR, AN_INPUT);
   pinMode(LIGHT_SENSOR, AN_INPUT);
+  pinMode(MOTOR, OUTPUT);
   Serial.begin(9600);
   //This is how we would trigger something remotely.
   //I'd kinda forgotten about Particle.function()
@@ -57,7 +58,7 @@ void loop() {
   int lightIntensity = analogRead(LIGHT_SENSOR);
   int soilMoisture = analogRead(SOIL_SENSOR);
 
-  Serial.printlnf("Soil Sensor: %d, Light Sensor: %d", moistness, brightness);
+  Serial.printlnf("Soil Sensor: %d, Light Sensor: %d", soilMoisture, lightIntensity);
   
   char json[256]; // Get the json string for ThingSpeak
   snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoisture\":%.2f}", lightIntensityFrequency, soilMoistureLevel);
@@ -66,8 +67,8 @@ void loop() {
     timer = millis();
   }
   // Send info to ubidots
-  ubidots.add("LightIntensity", brightness);
-  ubidots.add("SoilMoisture", moistness);
+  ubidots.add("LightIntensity", lightIntensity);
+  ubidots.add("SoilMoisture", soilMoisture);
   ubidots.send();
 
   if (motorSpinning) {
