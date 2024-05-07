@@ -52,11 +52,12 @@ void setup() {
 
 // loop() runs over and over again, as quickly as it can execute.
 time32_t timer = 0;
+time64_t lastWatered = 0;
 bool motorSpinning = false;
 void loop() {
 
   int lightIntensity = analogRead(LIGHT_SENSOR);
-  int soilMoisture = analogRead(SOIL_SENSOR);
+  int soilMoisture = 4095 - analogRead(SOIL_SENSOR);
 
   Serial.printlnf("Soil Sensor: %d, Light Sensor: %d", soilMoisture, lightIntensity);
   
@@ -71,13 +72,32 @@ void loop() {
   ubidots.add("SoilMoisture", soilMoisture);
   ubidots.send();
 
-  if (motorSpinning) {
+  /*if (motorSpinning) {
     digitalWrite(MOTOR, LOW);
     motorSpinning = false;
   } else {
     digitalWrite(MOTOR, HIGH);
     motorSpinning = true;
+    delay(2000);
   }
+  */
+
+  //The website for the soil moisture said that to calibrate it, you just stick it in water, measure that value,
+  //then measure its value in the air. I got about 1500 for the water value and 3050 for the air value.
+  //I'm going to do some trial and error to figure out what's a good amount.
+
+  //I got ~1050 for the dry value
+  //I got ~2400 for the wet value
+
+  if (soilMoisture < 1100 && millis() - lastWatered > 30000) {
+    digitalWrite(MOTOR, HIGH);
+    delay(1500);
+    digitalWrite(MOTOR, LOW);
+    lastWatered = millis();
+    Particle.publish("plantWatered");
+  }
+
+  
   
 
   delay(1000);
