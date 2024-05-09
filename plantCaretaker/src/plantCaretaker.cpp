@@ -110,7 +110,7 @@ void loop() {
   //I got ~2400 for the wet value
   //so there's a range of ~1350 that's actually valuable to us
 
-  if (soilMoisture < drynessThreshold && millis() - lastWatered > 30000) {
+  if (soilMoisture < drynessThreshold && millis() - lastWatered > 120000) {
     
     waterPlant("");
   }
