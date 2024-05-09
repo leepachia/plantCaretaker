@@ -10,6 +10,9 @@
 #include "Particle.h"
 #define TOKEN "BBUS-2mjQJfs1kFlFgeWbcJXfKzGjY1wSEY"
 #include "Ubidots.h"
+#include <string>
+#include <iostream>
+using namespace std;
 
 const int SOIL_SENSOR = A1;
 const int LIGHT_SENSOR = A5;
@@ -29,11 +32,18 @@ SerialLogHandler logHandler(LOG_LEVEL_INFO);
 
 double soilMoistureLevel;
 double lightIntensityFrequency;
+int drynessThreshold = 1100;
 
 int waterPlant (String argument) {
   //turn the pin on, then off or something
   //like that.
   return 1; //or something
+}
+
+int updateDrynessThreshold(String argument) {
+  int newThreshold = atoi(argument);
+  drynessThreshold = newThreshold;
+  return newThreshold;
 }
 
 // setup() runs once, when the device is first turned on
@@ -48,6 +58,7 @@ void setup() {
   //I'm not sure how many cloud functions we'll need,
   //but it supports up to twelve
   Particle.function("waterPlant", waterPlant);
+  Particle.function("calibrate", updateDrynessThreshold);
 }
 
 // loop() runs over and over again, as quickly as it can execute.
@@ -62,8 +73,8 @@ void loop() {
   Serial.printlnf("Soil Sensor: %d, Light Sensor: %d", soilMoisture, lightIntensity);
   
   char json[256]; // Get the json string for ThingSpeak
-  snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoisture\":%.2f}", lightIntensityFrequency, soilMoistureLevel);
-  if (timer > 30000) {
+  snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoisture\":%.2f}", lightIntensity, soilMoisture);
+  if (millis() - timer > 30000) {
     Particle.publish("sendPlantData", json); // Send the data to the webhook
     timer = millis();
   }
