@@ -33,10 +33,16 @@ SerialLogHandler logHandler(LOG_LEVEL_INFO);
 double soilMoistureLevel;
 double lightIntensityFrequency;
 int drynessThreshold = 1100;
+time64_t lastWatered = 0;
 
 int waterPlant (String argument) {
   //turn the pin on, then off or something
   //like that.
+  digitalWrite(MOTOR, HIGH);
+  delay(1500);
+  digitalWrite(MOTOR, LOW);
+  lastWatered = millis();
+  Particle.publish("plantWatered");
   return 1; //or something
 }
 
@@ -63,17 +69,20 @@ void setup() {
 
 // loop() runs over and over again, as quickly as it can execute.
 time32_t timer = 0;
-time64_t lastWatered = 0;
+
 bool motorSpinning = false;
+time32_t printDelay = 0;
+
 void loop() {
 
   int lightIntensity = analogRead(LIGHT_SENSOR);
   int soilMoisture = 4095 - analogRead(SOIL_SENSOR);
-
-  Serial.printlnf("Soil Sensor: %d, Light Sensor: %d", soilMoisture, lightIntensity);
-  
+  if (millis() - printDelay >= 1000) {
+    printDelay = millis();
+    Serial.printlnf("Soil Sensor: %d, Light Sensor: %d, Device ID: %d" , soilMoisture, lightIntensity, System.deviceID());
+  }
   char json[256]; // Get the json string for ThingSpeak
-  snprintf(json, sizeof(json), "{\"lightIntensity\":%.1f,\"soilMoisture\":%.2f}", lightIntensity, soilMoisture);
+  snprintf(json, sizeof(json), "{\"lightIntensity\":%d,\"soilMoisture\":%d}", lightIntensity, soilMoisture);
   if (millis() - timer > 30000) {
     Particle.publish("sendPlantData", json); // Send the data to the webhook
     timer = millis();
@@ -99,17 +108,10 @@ void loop() {
 
   //I got ~1050 for the dry value
   //I got ~2400 for the wet value
+  //so there's a range of ~1350 that's actually valuable to us
 
-  if (soilMoisture < 1100 && millis() - lastWatered > 30000) {
-    digitalWrite(MOTOR, HIGH);
-    delay(1500);
-    digitalWrite(MOTOR, LOW);
-    lastWatered = millis();
-    Particle.publish("plantWatered");
+  if (soilMoisture < drynessThreshold && millis() - lastWatered > 30000) {
+    
+    waterPlant("");
   }
-
-  
-  
-
-  delay(1000);
 }
