@@ -35,6 +35,7 @@ double lightIntensityFrequency;
 int drynessThreshold = 1100;
 time64_t lastWatered = 0;
 bool wasWatered = false;
+long interval = 300000;
 
 int waterPlant (String argument) {
   //turn the pin on, then off or something
@@ -43,7 +44,7 @@ int waterPlant (String argument) {
   delay(1500);
   digitalWrite(MOTOR, LOW);
   lastWatered = millis();
-  Particle.publish("plantWatered");
+  //Particle.publish("plantWatered");
   wasWatered = true;
   return 1; //or something
 }
@@ -54,6 +55,12 @@ int updateDrynessThreshold(String argument) {
   double toRawNumber = ((double)newThreshold/100) * 1400;
   drynessThreshold = (int) toRawNumber + 1050;
   return drynessThreshold;
+}
+
+int adjustUpdateSpeed(String argument) {
+  int newSpeed = atoi(argument);
+  interval = newSpeed * 1000;
+  return newSpeed;
 }
 
 // setup() runs once, when the device is first turned on
@@ -69,6 +76,7 @@ void setup() {
   //but it supports up to twelve
   Particle.function("waterPlant", waterPlant);
   Particle.function("calibrate", updateDrynessThreshold);
+  Particle.function("adjustUpdateSpeed", adjustUpdateSpeed);
 }
 
 // loop() runs over and over again, as quickly as it can execute.
@@ -76,7 +84,7 @@ time32_t timer = 0;
 
 bool motorSpinning = false;
 time32_t printDelay = 0;
-long interval = 300000;
+
 
 int soilRollingAvg[20];
 int oldestIndex = 0;
