@@ -126,11 +126,11 @@ void loop() {
     sum /= 20;
     soilAvg = sum;
     printDelay = millis();
-    Serial.printlnf("Soil Sensor: %d, Light Sensor: %d, Threshold: %d" , soilAvg, lightValue, drynessThreshold);
+    Serial.printlnf("Soil Sensor: %d, Light Sensor: %d, Threshold: %d" , soilMoisture, lightValue, drynessThreshold);
   }
 
   
-  if (millis() - timer > interval) {
+  if (millis() - timer > interval || wasWatered) {
     char json[256]; // Get the json string for ThingSpeak
     snprintf(json, sizeof(json), "{\"lightIntensity\":%d,\"soilMoisture\":%d,\"isWatered\":%d}", lightIntensity, soilMoisture,
     wasWatered);
@@ -153,7 +153,7 @@ void loop() {
   //I got ~2400 for the wet value
   //so there's a range of ~1350 that's actually valuable to us
 
-  if (dirtValue < drynessThreshold && millis() - lastWatered > 120000) {
+  if (soilAvg < drynessThreshold && millis() - lastWatered > 120000) {
     
     waterPlant("");
   }
